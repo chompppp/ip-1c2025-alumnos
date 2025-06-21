@@ -9,9 +9,23 @@ def index_page(request):
     return render(request, 'index.html')
 
 # esta función obtiene 2 listados: uno de las imágenes de la API y otro de favoritos, ambos en formato Card, y los dibuja en el template 'home.html'.
+def card_color(types):
+    if "fire" in types:
+        return "border-danger"
+    elif "water" in types:
+        return "border-primary"
+    elif "grass" in types:
+        return "border-success"
+    else:
+        return "border-warning"
+    
 def home(request):
-    images = [services.getAllImages()]
+    images = services.getAllImages()
     favourite_list = []
+
+    for img in images:
+        img.border_class = card_color(img.types)
+
     return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
 
 # función utilizada en el buscador.
@@ -20,7 +34,10 @@ def search(request):
 
     # si el usuario ingresó algo en el buscador, se deben filtrar las imágenes por dicho ingreso.
     if (name != ''):
-        images = []
+        images = services.filterByCharacter(name)
+        for img in images:
+            img.border_class=card_color(img.types)
+
         favourite_list = []
 
         return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
@@ -29,13 +46,15 @@ def search(request):
 
 # función utilizada para filtrar por el tipo del Pokemon
 def filter_by_type(request):
-    type = request.POST.get('type', '')
+    type_filter = request.POST.get('type', '').lower()
 
-    if type != '':
-        images = [] # debe traer un listado filtrado de imágenes, segun si es o contiene ese tipo.
+    if type_filter != '':
+        images = services.filterByType(type_filter) # debe traer un listado filtrado de imágenes, segun si es o contiene ese tipo.
         favourite_list = []
-
+        for img in images:
+            img.border_class = card_color(img.types)        
         return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
+
     else:
         return redirect('home')
 
