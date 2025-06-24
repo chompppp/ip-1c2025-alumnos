@@ -1,5 +1,5 @@
 # capa de vista/presentación
-
+from django.db import IntegrityError
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -42,7 +42,7 @@ def card_color(types):
     
 def home(request):
     images = services.getAllImages()
-    favourite_list = []
+    favourite_list = list(Favourite.objects.filter(user=request.user).values_list('name', flat=True))
 
     for img in images:
         img.border_class = card_color(img.types)
@@ -114,6 +114,9 @@ def saveFavourite(request):
                 types=types,
                 image=image
             )
+            messages.success(request, f"{name} se agregó a tus favoritos.")
+        else:
+            messages.warning(request, f"{name} ya está en tus favoritos.")
     return redirect("home")
 
 @login_required
