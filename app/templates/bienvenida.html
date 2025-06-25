@@ -1,0 +1,7 @@
+{% extends 'header.html' %}
+{% block content %}
+  <div class="container mt-5 text-center">
+    <h2>¡Bienvenido {{ usuario.first_name }}!</h2>
+    <p>Ya estás logueado. Podés ver los Pokémon <a href="{% url 'home' %}">acá</a>.</p>
+  </div>
+{% endblock %}

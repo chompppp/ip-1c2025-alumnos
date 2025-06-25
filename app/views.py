@@ -14,6 +14,9 @@ from .models import Favourite
 import json
 
 def index_page(request):
+    if request.user.is_authenticated:
+        return render(request, 'bienvenida.html', {'usuario': request.user})
+    
     if request.method == "POST":
         username=request.POST.get("username")
         password=request.POST.get("password")
@@ -42,7 +45,9 @@ def card_color(types):
     
 def home(request):
     images = services.getAllImages()
-    favourite_list = list(Favourite.objects.filter(user=request.user).values_list('name', flat=True))
+    favourite_list=[]
+    if request.user.is_authenticated:
+        favourite_list = list(Favourite.objects.filter(user=request.user).values_list('name', flat=True))
 
     for img in images:
         img.border_class = card_color(img.types)
